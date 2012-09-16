@@ -1,4 +1,24 @@
-Testsidekiq::Application.configure do
+# -*- encoding : utf-8 -*-
+memcache_options = {
+  :c_threshold => 10_000,
+  :compression => false,
+  :debug => false,
+  :namespace => '40ilife',
+  :readonly => false,
+  :urlencode => false,
+}
+
+def compile_asset?(path)
+  if File.basename(path) =~ /^[^_].*\.\w+$/
+    puts "Compiling: #{path}"
+    true
+  else
+    puts "Ignoring: #{path}"
+    false
+  end
+end
+
+Ilife::Application.configure do
   # Settings specified here will take precedence over those in config/application.rb
 
   # Code is not reloaded between requests
@@ -9,13 +29,13 @@ Testsidekiq::Application.configure do
   config.action_controller.perform_caching = true
 
   # Disable Rails's static asset server (Apache or nginx will already do this)
-  config.serve_static_assets = false
+  config.serve_static_assets = true
 
   # Compress JavaScripts and CSS
   config.assets.compress = true
 
   # Don't fallback to assets pipeline if a precompiled asset is missed
-  config.assets.compile = false
+  config.assets.compile = true
 
   # Generate digests for assets URLs
   config.assets.digest = true
@@ -25,7 +45,7 @@ Testsidekiq::Application.configure do
 
   # Specifies the header that your server uses for sending files
   # config.action_dispatch.x_sendfile_header = "X-Sendfile" # for apache
-  # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for nginx
+  config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for nginx
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   # config.force_ssl = true
@@ -41,12 +61,18 @@ Testsidekiq::Application.configure do
 
   # Use a different cache store in production
   # config.cache_store = :mem_cache_store
+  config.cache_store = [:mem_cache_store, "127.0.0.1:11211", memcache_options]
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server
   # config.action_controller.asset_host = "http://assets.example.com"
 
   # Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
-  # config.assets.precompile += %w( search.js )
+  #config.assets.precompile += %w( *.js *.css )
+
+
+  config.assets.precompile = [method(:compile_asset?).to_proc]
+  #config.assets.precompile += ['sidekiq/application.css', 'sidekiq/application.js']
+  #config.assets.precompile += [ Proc.new {|path| File.basename(path) =~ /^[^_].*\.\w+$/} ]
 
   # Disable delivery errors, bad email addresses will be ignored
   # config.action_mailer.raise_delivery_errors = false
@@ -63,5 +89,25 @@ Testsidekiq::Application.configure do
 
   # Log the query plan for queries taking more than this (works
   # with SQLite, MySQL, and PostgreSQL)
+  
   # config.active_record.auto_explain_threshold_in_seconds = 0.5
+  
+  config.middleware.use ExceptionNotifier,
+    :email_prefix => "[40ilife Exception] ",
+    :sender_address => %{"40ilife Exception Notifier" <no-reply@40ilife.com>},
+    :exception_recipients => %w{exception@40ilife.com}
+  
+  config.action_mailer.default_url_options = { :host => 'www.40ilife.com' }
+  config.action_mailer.delivery_method = :smtp
+  
+  config.action_mailer.smtp_settings = {
+    :address => AppSettings.smtp_address,
+    :port => AppSettings.smtp_port,
+    :domain => AppSettings.smtp_domain,
+    :authentication => :login,
+    :user_name => AppSettings.smtp_user_name,
+    :password => AppSettings.smtp_password
+  }
+  config.action_mailer.default :charset => "utf-8"
+  #config.quiet_assets = false
 end

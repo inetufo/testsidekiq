@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 require 'sidekiq/web'
 Testsidekiq::Application.routes.draw do
   mount Sidekiq::Web => "/sidekiq", :as => "sidekiq_web"
