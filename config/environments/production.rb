@@ -99,14 +99,14 @@ Testsidekiq::Application.configure do
   config.action_mailer.default_url_options = { :host => 'www.40ilife.com' }
   config.action_mailer.delivery_method = :smtp
   
-  config.action_mailer.smtp_settings = {
-    :address => AppSettings.smtp_address,
-    :port => AppSettings.smtp_port,
-    :domain => AppSettings.smtp_domain,
-    :authentication => :login,
-    :user_name => AppSettings.smtp_user_name,
-    :password => AppSettings.smtp_password
-  }
+  #config.action_mailer.smtp_settings = {
+  #  :address => AppSettings.smtp_address,
+  #  :port => AppSettings.smtp_port,
+  #  :domain => AppSettings.smtp_domain,
+  #  :authentication => :login,
+  #  :user_name => AppSettings.smtp_user_name,
+  #  :password => AppSettings.smtp_password
+  #}
   config.action_mailer.default :charset => "utf-8"
   #config.quiet_assets = false
 end
