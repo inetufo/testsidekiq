@@ -17,3 +17,4 @@ Started GET "/sidekiq/assets/application.js" for 127.0.0.1 at 2012-09-16 03:26:2
 
 
 Started GET "/sidekiq/assets/application.css" for 127.0.0.1 at 2012-09-16 03:26:21 +0800
+Connecting to database specified by database.yml
