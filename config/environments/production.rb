@@ -18,7 +18,7 @@ def compile_asset?(path)
   end
 end
 
-Ilife::Application.configure do
+Testsidekiq::Application.configure do
   # Settings specified here will take precedence over those in config/application.rb
 
   # Code is not reloaded between requests
